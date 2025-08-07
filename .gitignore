@@ -1,4 +1,4 @@
 **/node_modules/
 **/.env
-**/scheduled_messages.json
-**/tokens.json
+backend/data/scheduled_messages.json
+backend/data/tokens.json
