@@ -4,9 +4,7 @@ import { storeToken } from '../storage/storage';
 
 const router = express.Router();
 
-/**
- * Redirect user to Slack OAuth screen
- */
+//Redirect user to Slack OAuth screen
 router.get('/auth', (req, res) => {
   const clientId = process.env.SLACK_CLIENT_ID;
   const redirectUri = process.env.SLACK_REDIRECT_URI;
@@ -22,9 +20,7 @@ router.get('/auth', (req, res) => {
   res.redirect(authUrl);
 });
 
-/**
- * Handle Slack OAuth callback and save bot token
- */
+//Handle Slack OAuth callback and save bot token
 router.get('/callback', async (req, res) => {
   const code = req.query.code as string;
 
@@ -42,62 +38,32 @@ router.get('/callback', async (req, res) => {
 
     if (data.ok) {
       const teamId = data.team.id;
-      // const accessToken = data.access_token;
-      // const botUserId = data.bot_user_id;
-      // const botId = data.bot_id;
-
-      // storeToken(teamId, accessToken, botUserId, botId);
       const accessToken = data.access_token;
       const refreshToken = data.refresh_token;
-      const expiresIn = data.expires_in; // should be 43200 (12 hours)
+      const expiresIn = data.expires_in;
       const botUserId = data.bot_user_id;
       const botId = data.bot_id;
 
       const expiresAt = Date.now() + expiresIn * 1000;
 
-      storeToken(teamId, accessToken, refreshToken, expiresAt, botUserId, botId); // New version
+      storeToken(teamId, accessToken, refreshToken, expiresAt, botUserId, botId);
 
       
 
-      console.log(`[OAuth] Connected workspace: ${data.team.name}`);
+      // console.log(`Connected workspace: ${data.team.name}`);
       // res.send('Slack workspace connected successfully!');
-      // res.redirect('http://localhost:3000/dashboard');
       res.redirect(
   `http://localhost:3000/dashboard?teamId=${teamId}&teamName=${encodeURIComponent(data.team.name)}&botUserId=${botUserId}`
 );
+
     } else {
-      console.error(`[OAuth Error] ${data.error}`);
+      console.error(`OAuth Error ${data.error}`);
       res.status(400).send(`OAuth failed: ${data.error}`);
     }
   } catch (err) {
-    console.error('[OAuth Callback Error]', err);
+    console.error('OAuth Callback Error', err);
     res.status(500).send('Server error during Slack OAuth callback');
   }
 });
 
-/**
- * Optional: For debugging — check stored tokens
- */
-import { getAllTokens } from '../storage/storage';
-router.get('/tokens', (req, res) => {
-  res.json(getAllTokens());
-});
-
-router.get('/verify', async (req, res) => {
-  const tokens = getAllTokens();
-  const token = Object.values(tokens)[0]; // get first token
-
-  if (!token) return res.status(400).send('No token found');
-
-  try {
-    const response = await axios.post('https://slack.com/api/auth.test', null, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    res.json(response.data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error verifying token');
-  }
-});
 export default router;

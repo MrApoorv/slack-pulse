@@ -1,16 +1,12 @@
 import express from 'express';
 import axios from 'axios';
-import { getToken } from '../storage/storage';
 import { addScheduledMessage, getScheduledMessages, removeScheduledMessage } from '../storage/scheduler';
 import { v4 as uuidv4 } from 'uuid';
 import { getValidAccessToken } from '../utils/authUtils';
 
 const router = express.Router();
 
-/**
- * POST /slack/message/send
- * Sends a message immediately to a specified channel
- */
+//POST - Sends a message immediately to a specified channel
 router.post('/message/send', async (req, res) => {
   const { teamId, channel, message } = req.body;
 
@@ -18,7 +14,6 @@ router.post('/message/send', async (req, res) => {
     return res.status(400).json({ error: 'Missing teamId, channel, or message' });
   }
 
-  // const token = getToken(teamId);
   const token = await getValidAccessToken(teamId);
   if (!token) {
     return res.status(401).json({ error: 'Workspace not connected or token not found' });
@@ -50,15 +45,14 @@ router.post('/message/send', async (req, res) => {
   }
 });
 
-
+//GET to fetch all the channels
 router.get('/channels', async (req, res) => {
   const teamId = req.query.teamId as string;
-  console.log('Received request:', req.query);
+  // console.log('Received request:', req.query);
   if (!teamId) {
     return res.status(400).json({ error: 'Missing teamId in query' });
   }
 
-  // const token = getToken(teamId);
   const token = await getValidAccessToken(teamId);
   if (!token) {
     return res.status(401).json({ error: 'No token found for this teamId' });
@@ -92,6 +86,7 @@ router.get('/channels', async (req, res) => {
   }
 });
 
+//POST to schedule a message
 router.post('/message/schedule', async (req, res) => {
   const { teamId, channel, message, scheduleTime } = req.body;
 
@@ -114,7 +109,7 @@ router.post('/message/schedule', async (req, res) => {
     scheduleTime: time.toISOString(),
   });
 
-  console.log(`[🕒] Scheduled message ${id} at ${time.toISOString()}`);
+  // console.log(`Scheduled message ${id} at ${time.toISOString()}`);
 
   res.json({ success: true, scheduledId: id });
 });
@@ -147,9 +142,6 @@ router.delete('/message/cancel/:id', (req, res) => {
   const { id } = req.params;
   const teamId = req.query.teamId as string;
 
-
-  console.log('🧪 Trying to cancel:', id, teamId);
-  console.log('🗂️ Current scheduled messages:', getScheduledMessages());
   if (!teamId) {
     return res.status(400).json({ error: 'Missing teamId in query' });
   }
@@ -167,7 +159,7 @@ router.delete('/message/cancel/:id', (req, res) => {
   }
 
   removeScheduledMessage(id);
-  console.log(`[❌] Cancelled scheduled message ${id}`);
+  // console.log(`Cancelled scheduled message ${id}`);
 
   res.json({ success: true });
 });

@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { getToken } from './storage';
 import axios from 'axios';
 import { getValidAccessToken } from '../utils/authUtils';
 
@@ -73,12 +72,12 @@ export const startScheduler = async () => {
             }
           );
 
-          console.log(`[✅] Sent scheduled message: ${msg.message}`);
+          // console.log(`Sent scheduled message: ${msg.message}`);
           removeScheduledMessage(msg.id);
         } catch (error) {
-          console.error(`[❌] Failed to send scheduled message: ${msg.id}`, error);
+          console.error(`Failed to send scheduled message: ${msg.id}`, error);
         }
       }
     }
-  }, 1000); // check every second
+  }, 1000);
 };

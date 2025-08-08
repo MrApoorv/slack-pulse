@@ -44,8 +44,5 @@ export const getTokenData = (teamId: string): TokenData | undefined => {
   return tokens[teamId];
 };
 
-export const getToken = (teamId: string) => {
-  return tokens[teamId]?.accessToken;
-};
 
 export const getAllTokens = () => tokens;
