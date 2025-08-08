@@ -32,8 +32,8 @@ It uses **Slack OAuth** for authentication, securely stores and manages tokens, 
 ### **Step 2 – Clone the Repository**
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/MrApoorv/slack-pulse.git
+cd slack-pulse
 ```
 
 ---
@@ -55,8 +55,8 @@ cd <your-repo>
 3. Compile TypeScript (if needed) & run:
 
    ```bash
-   npm run build   # Compile TypeScript → dist/
-   npm run dev     # Start development server
+   npm run build 
+   npm run dev
    ```
 
 > **Note:** The backend is already configured for TypeScript (`tsconfig.json` is included).
